@@ -1,6 +1,16 @@
+import { Suspense } from 'react';
+import ShopClient from './ShopClient';
+
 export const metadata = {
   title: 'Shop — Browse All Products',
-  description: 'Explore our full range of electronics, laptops, smartphones, gaming gear and more. Filter by category, price and rating.',
+  description:
+    'Explore our full range of electronics, laptops, smartphones, gaming gear and more.',
 };
-import ShopClient from './ShopClient';
-export default function ShopPage() { return <ShopClient />; }
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ShopClient />
+    </Suspense>
+  );
+}
