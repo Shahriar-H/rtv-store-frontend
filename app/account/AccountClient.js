@@ -33,15 +33,17 @@ export default function AccountClient() {
 
   useEffect(() => {
     if (!user) return;
-    setForm({ name: user.name || '', phone: user.phone || '', address: user.address || '' });
-    api.getOrders().then(setOrders).catch(() => {});
+    setForm({ name: user.name || '', phone: user.phone || '', address: user.address?.country || '' });
+    api.getOrders().then((data) => setOrders(data?.data || [])).catch(() => {});
   }, [user]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
       const updated = await api.updateProfile(form);
-      login(updated, localStorage.getItem('robo_token'));
+      //console.log(updated?.data?.user);
+      
+      login(updated?.data?.user, localStorage.getItem('robo_token'));
       setSaveMsg('Profile updated!');
       setEditing(false);
       setTimeout(() => setSaveMsg(''), 3000);
@@ -69,11 +71,11 @@ export default function AccountClient() {
             {/* Profile card */}
             <div className="bg-white border border-gray-100 rounded-2xl p-6 text-center">
               <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-3">
-                {user.name?.charAt(0).toUpperCase()}
+                {user?.name?user?.name?.charAt(0).toUpperCase():"A"}
               </div>
-              <h2 className="font-bold text-dark text-lg">{user.name}</h2>
-              <p className="text-gray-400 text-sm">{user.email}</p>
-              {user.phone && <p className="text-gray-400 text-sm">{user.phone}</p>}
+              <h2 className="font-bold text-dark text-lg">{user?.name}</h2>
+              <p className="text-gray-400 text-sm">{user?.email}</p>
+              {user?.phone && <p className="text-gray-400 text-sm">{user.phone}</p>}
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-center">
                 <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-gray-400 hover:text-accent transition-colors">
                   <LogOut size={14} /> Sign Out
@@ -160,7 +162,7 @@ export default function AccountClient() {
                       <input type={type} value={form[key] || ''} onChange={e => setForm(p => ({ ...p, [key]: e.target.value }))}
                         className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary" />
                     ) : (
-                      <p className="text-sm text-dark font-medium py-2.5 px-3 bg-gray-50 rounded-lg">{value ?? form[key] || <span className="text-gray-300">Not set</span>}</p>
+                      <p className="text-sm text-dark font-medium py-2.5 px-3 bg-gray-50 rounded-lg">{value ?? form[key] ?? <span className="text-gray-300">Not set</span>}</p>
                     )}
                   </div>
                 ))}
