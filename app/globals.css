@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1B4AEF;
+  --primary-dark: #1338C8;
+  --accent: #DB4444;
+  --dark: #1A1A2E;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #1A1A2E;
+  background: #fff;
+}
+
+@layer components {
+  .container {
+    @apply max-w-[1280px] mx-auto px-4;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-md font-semibold hover:bg-primary-dark transition-all duration-200 inline-block;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary px-6 py-2.5 rounded-md font-semibold hover:bg-primary hover:text-white transition-all duration-200 inline-block;
+  }
+
+.product-card {
+  @apply bg-white rounded-lg border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden;
+}
+
+  .section-label {
+    @apply text-primary text-sm font-medium flex items-center gap-2 mb-1;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-dark mb-6;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #1B4AEF; border-radius: 3px; }
+
+/* Star rating */
+.stars { color: #FFAD33; }
+
+/* Hero slider dots */
+.slider-dot {
+  @apply w-2 h-2 rounded-full bg-gray-300 cursor-pointer transition-all duration-200;
+}
+.slider-dot.active {
+  @apply bg-primary w-6;
+}
+
+/* Countdown boxes */
+.countdown-box {
+  @apply bg-white rounded-lg p-3 text-center min-w-[70px] shadow-sm;
+}
+
+/* Category circle */
+.category-circle {
+  @apply w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary-light transition-colors duration-200 overflow-hidden;
+}
+
+/* Add to cart overlay */
+.product-card:hover .add-to-cart-overlay {
+  @apply opacity-100 translate-y-0;
+}
+
+.add-to-cart-overlay {
+  @apply opacity-0 translate-y-full transition-all duration-300;
+}
+
+/* Newsletter gradient */
+.newsletter-bg {
+  background: linear-gradient(135deg, #1B4AEF 0%, #0F2D99 100%);
+}
+
+/* Promo card teal */
+.promo-teal {
+  background: linear-gradient(135deg, #E8F7F7 0%, #D0EFEF 100%);
+}
+
+/* Promo card peach */
+.promo-peach {
+  background: linear-gradient(135deg, #FFF3E8 0%, #FFE8D0 100%);
+}
