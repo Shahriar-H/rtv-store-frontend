@@ -27,10 +27,11 @@ export default function CheckoutClient() {
     fullName: user?.name || '',
     email: user?.email || '',
     phone: user?.phone || '',
-    address: '',
+    street: '',
     city: '',
-    division: 'Dhaka',
+    state: 'Dhaka',
     zipCode: '',
+    country: 'Bangladesh',
   });
 
   const [payment, setPayment] = useState({
@@ -59,15 +60,18 @@ export default function CheckoutClient() {
       const newOrder = await api.createOrder({
         items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity })),
         shippingAddress: shipping,
+        user: user.id,
         paymentMethod: payment.method,
         bkashNumber: payment.bkashNumber,
       });
+      console.log(newOrder);
+      
       if (payment.method === 'bkash') {
-        setOrder(newOrder);
+        setOrder(newOrder?.data);
         setBkashStep(2);
         setStep(2.5); // bkash confirm step
       } else {
-        setOrder(newOrder);
+        setOrder(newOrder?.data);
         clearCart();
         setStep(3);
       }
@@ -80,7 +84,7 @@ export default function CheckoutClient() {
     if (!payment.bkashTransactionId.trim()) { setError('Please enter your bKash transaction ID'); return; }
     setLoading(true); setError('');
     try {
-      const updated = await api.confirmBkash(order.id, payment.bkashTransactionId);
+      const updated = await api.confirmBkash(order?.id, payment.bkashTransactionId);
       setOrder(updated);
       clearCart();
       setStep(3);
@@ -151,16 +155,15 @@ export default function CheckoutClient() {
                     <label className="text-sm font-medium text-dark mb-1.5 block">Street Address <span className="text-accent">*</span></label>
                     <div className="relative">
                       <MapPin size={15} className="absolute left-3 top-3.5 text-gray-400" />
-                      <input type="text" name="address" value={shipping.address} onChange={handleShippingChange} placeholder="House #, Road #, Area" required
+                      <input type="text" name="street" value={shipping.street} onChange={handleShippingChange} placeholder="House #, Road #, Area" required
                         className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-dark mb-1.5 block">Division <span className="text-accent">*</span></label>
-                    <select name="division" value={shipping.division} onChange={handleShippingChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary bg-white">
-                      {DIVISIONS.map(d => <option key={d}>{d}</option>)}
-                    </select>
+                    <label className="text-sm font-medium text-dark mb-1.5 block">State <span className="text-accent">*</span></label>
+                    <input list="divisions" name="state" value={shipping.state} onChange={handleShippingChange} placeholder="Select division" required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary" />
+                    
                   </div>
                   <div>
                     <label className="text-sm font-medium text-dark mb-1.5 block">City <span className="text-accent">*</span></label>
@@ -170,7 +173,7 @@ export default function CheckoutClient() {
                 </div>
                 <button
                   onClick={() => {
-                    if (!shipping.fullName || !shipping.phone || !shipping.address || !shipping.city) { setError('Please fill all required fields'); return; }
+                    if (!shipping.fullName || !shipping.phone || !shipping.street || !shipping.city) { setError('Please fill all required fields'); return; }
                     setError(''); setStep(2);
                   }}
                   className="btn-primary mt-6 w-full py-3 text-center">

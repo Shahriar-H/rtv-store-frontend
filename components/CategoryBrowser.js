@@ -51,9 +51,9 @@ export default function CategoryBrowser() {
             className="group flex flex-col items-center flex-shrink-0 min-w-[100px]"
           >
             <div className="category-circle">
-              {categoryImages[cat.slug] ? (
+              {cat.image ? (
                 <div className="relative w-full h-full">
-                  <Image src={categoryImages[cat.slug]} alt={cat.name} fill className="object-cover" />
+                  <Image src={cat.image} alt={cat.name} fill className="object-cover" />
                 </div>
               ) : (
                 <span className="text-3xl">{cat.icon}</span>

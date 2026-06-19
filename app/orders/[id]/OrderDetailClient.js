@@ -47,7 +47,7 @@ export default function OrderDetailClient({ orderId }) {
   useEffect(() => {
     if (!user) return;
     api.getOrder(orderId)
-      .then(setOrder)
+      .then((data) => setOrder(data?.data))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, [user, orderId]);
@@ -261,16 +261,16 @@ export default function OrderDetailClient({ orderId }) {
                 <MapPin size={16} className="text-primary" /> Delivery Address
               </h3>
               <div className="text-sm space-y-1.5 text-gray-600">
-                <p className="font-semibold text-dark">{order.shippingAddress?.fullName}</p>
-                <p>{order.shippingAddress?.address}</p>
-                <p>{order.shippingAddress?.city}, {order.shippingAddress?.division}</p>
+                <p className="font-semibold text-dark">{order.user?.name}</p>
+                <p className='italic'>{order.shippingAddress?.street},{order.shippingAddress?.city}</p>
+                <p className='italic'>{order.shippingAddress?.state}, {order.shippingAddress?.country}</p>
                 <div className="flex items-center gap-1.5 pt-1">
                   <Phone size={13} className="text-gray-400" />
-                  <span>{order.shippingAddress?.phone}</span>
+                  <span>{order.user?.phone}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Mail size={13} className="text-gray-400" />
-                  <span>{order.shippingAddress?.email}</span>
+                  <span>{order.user?.email}</span>
                 </div>
               </div>
             </div>

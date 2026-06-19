@@ -1678,6 +1678,9 @@ video {
 .capitalize{
   text-transform: capitalize;
 }
+.italic{
+  font-style: italic;
+}
 .leading-none{
   line-height: 1;
 }
