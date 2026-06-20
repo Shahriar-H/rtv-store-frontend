@@ -6,6 +6,8 @@ import { Search, Phone, User, ShoppingCart, Heart, Eye, Menu, X, ChevronDown, Lo
 import { useCart } from '../lib/CartContext';
 import { useAuth } from '../lib/CartContext';
 import CartDrawer from './CartDrawer';
+import Image from 'next/image';
+import logo from '../assets/logo.png';
 
 export default function Navbar() {
   const { cartCount, setCartOpen } = useCart();
@@ -23,26 +25,27 @@ export default function Navbar() {
   const handleLogout = () => { logout(); setUserMenuOpen(false); router.push('/'); };
 
   const navLinks = [
-    { label: 'Popular', href: '/#popular' },
+    { label: 'Home', href: '/' },
     { label: 'Shop', href: '/shop' },
-    { label: 'Contact', href: '#contact' },
-    { label: 'Categories', href: '/shop', hasDropdown: true },
+    { label: 'Contact', href: '/contact-us' },
+    { label: 'Categories', href: '/shop', hasDropdown: false },
   ];
 
   return (
     <>
       <CartDrawer />
       <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="border-b border-gray-100">
+        <div className="border-b border-gray-100 pt-4">
           <div className="container flex items-center justify-between h-16 gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              {/* <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <div className="leading-tight">
                 <div className="font-bold text-dark text-sm">ROBO</div>
                 <div className="text-gray-400 text-xs">TECH VALLEY</div>
-              </div>
+              </div> */}
+              <Image src={logo} alt="Robo Tech Valley" width={100} height={20} className="object-contain" />
             </Link>
 
             <form onSubmit={handleSearch} className="flex-1 max-w-2xl hidden md:flex items-center border border-gray-200 rounded-lg overflow-hidden">

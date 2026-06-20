@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import logo from '../assets/logo.png';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -8,22 +10,23 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              {/* <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
               <div className="leading-tight">
                 <div className="font-bold text-dark text-sm">ROBO</div>
                 <div className="text-gray-400 text-xs">TECH VALLEY</div>
-              </div>
+              </div> */}
+              <Image src={logo} alt="Robo Tech Valley" width={100} height={20} className="object-contain" />
             </div>
             <div className="space-y-3 text-sm text-gray-500">
               <div className="flex items-start gap-2">
                 <MapPin size={15} className="text-primary mt-0.5 flex-shrink-0" />
-                <span>685 Market Street, Las Vegas, LA 95820, United States.</span>
+                <span>Level. 4,House 26/1, Road No. 04, Shialbari Graveyard, Rupnagar Rd, Dhaka 1216</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={15} className="text-primary flex-shrink-0" />
-                <span>(+880) 1700-000000</span>
+                <span>(+880) 1758-518707</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={15} className="text-primary flex-shrink-0" />
@@ -57,30 +60,37 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-dark mb-4">Quick Links</h4>
             <ul className="space-y-2.5 text-sm text-gray-500">
-              {['Privacy Policy', 'Refund Policy', 'Terms of Use', "FAQ's", 'Contact Us'].map(item => (
-                <li key={item}><Link href="#" className="hover:text-primary transition-colors">{item}</Link></li>
+              {/* ['Privacy Policy', 'Refund Policy', 'Terms of Use', "FAQ's", 'Contact Us'] */}
+              {[
+                { href: '/privacy-policy', label: 'Privacy Policy' },
+                { href: '/refund-policy', label: 'Refund Policy' },
+                { href: '/terms-of-use', label: 'Terms of Use' },
+                { href: '/faqs', label: 'FAQs' },
+                { href: '/contact-us', label: 'Contact Us' },
+              ].map(item => (
+                <li key={item.href}><Link href={item.href} className="hover:text-primary transition-colors">{item.label}</Link></li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-dark mb-2">Download App</h4>
-            <p className="text-xs text-gray-400 mb-4">Save $3 With App & New User only</p>
+            <h4 className="font-bold text-dark mb-2">Our Apps</h4>
+            <p className="text-xs text-gray-400 mb-4">Find our developed app on Google Play.</p>
             <div className="space-y-3">
-              <button className="w-full bg-dark text-white rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-gray-800 transition-colors">
+              {/* <button className="w-full bg-dark text-white rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-gray-800 transition-colors">
                 <div className="text-2xl leading-none">🍎</div>
                 <div className="text-left">
                   <div className="text-xs text-gray-400">Download on the</div>
                   <div className="font-semibold text-sm">App Store</div>
                 </div>
-              </button>
-              <button className="w-full bg-dark text-white rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-gray-800 transition-colors">
+              </button> */}
+              <a href="https://play.google.com/store/apps/developer?id=Robo+Tech+Valley" target="_blank" rel="noopener noreferrer" className="w-full bg-dark text-white rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-gray-800 transition-colors">
                 <div className="text-2xl leading-none">▶</div>
                 <div className="text-left">
-                  <div className="text-xs text-gray-400">Get It On</div>
+                  <div className="text-xs text-gray-400">Get our Apps on</div>
                   <div className="font-semibold text-sm">Google Play</div>
                 </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
