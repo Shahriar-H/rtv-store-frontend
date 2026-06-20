@@ -47,9 +47,9 @@ const sideDeals1 = [
 export default function HeroBanner() {
   const [active, setActive] = useState(0);
   const [products, setProducts] = useState([]);
-  const [slides, setslides] = useState([]);
+  const [slides, setslides] = useState(slides1);
   const [loading, setLoading] = useState(true);
-  const [sideDeals, setsideDeals] = useState([]);
+  const [sideDeals, setsideDeals] = useState(sideDeals1);
 
   useEffect(() => {
     api.getProducts({ type: 'sale', perPage: 2 })
