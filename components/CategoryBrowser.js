@@ -53,14 +53,15 @@ export default function CategoryBrowser() {
             <div className="category-circle">
               {cat.image ? (
                 <div className="relative w-full h-full">
-                  <Image src={cat.image} alt={cat.name} fill className="object-cover" />
+                  <Image src={cat?.image || "/assets/no-image.png"} alt={cat?.name} fill className="object-cover" />
                 </div>
+
               ) : (
-                <span className="text-3xl">{cat.icon}</span>
+                <span className="text-3xl">{cat?.icon}</span>
               )}
             </div>
             <p className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors text-center">
-              {cat.name}
+              {cat?.name}
             </p>
           </button>
         ))}

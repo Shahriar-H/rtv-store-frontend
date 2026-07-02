@@ -95,11 +95,11 @@ export default function HeroBanner() {
               <h1 className="text-2xl md:text-3xl font-bold text-dark mb-3 leading-tight max-w-xs">
                 {slide?.name}
               </h1>
-              <p className="text-gray-500 text-sm mb-6 max-w-xs">{slide?.description}</p>
+              <p className="text-gray-500 text-sm mb-6 max-w-xs">{slide?.description?.substring(0, 100)}</p>
               <button className="btn-primary">Shop Now →</button>
             </div>
             <div className="relative w-56 h-56 md:w-72 md:h-72 flex-shrink-0 mt-6 md:mt-0">
-              <Image src={slide?.image} alt={slide?.name} fill className="object-contain drop-shadow-2xl" />
+              <Image src={slide?.image || "/assets/no-image.png"} alt={slide?.name} fill className="object-contain drop-shadow-2xl" />
             </div>
           </div>
           {/* Dots */}

@@ -26,7 +26,7 @@ export default function CartDrawer() {
           ) : cart.map(item => (
             <div key={item.product.id} className="flex gap-3 bg-gray-50 rounded-lg p-3">
               <div className="relative w-14 h-14 flex-shrink-0 bg-white rounded-md overflow-hidden">
-                <Image src={item.product.image} alt={item.product.name} fill className="object-cover" />
+                <Image src={item.product.image || "/assets/no-image.png"} alt={item.product.name} fill className="object-cover" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-dark line-clamp-1">{item.product.name}</p>
