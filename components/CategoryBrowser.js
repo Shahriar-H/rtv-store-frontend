@@ -58,7 +58,9 @@ export default function CategoryBrowser() {
                 </div>
 
               ) : (
-                <span className="text-3xl">{cat?.icon}</span>
+                <div className="relative w-full h-full">
+                  <Image src={NoImage} alt={cat?.name} fill className="object-cover" />
+                </div>
               )}
             </div>
             <p className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors text-center">

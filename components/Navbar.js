@@ -34,7 +34,7 @@ export default function Navbar() {
   return (
     <>
       <CartDrawer />
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
+      <header className="sticky top-0 z-20 bg-white shadow-sm">
         <div className="border-b border-gray-100 pt-4">
           <div className="container flex items-center justify-between h-16 gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
@@ -58,7 +58,7 @@ export default function Navbar() {
                 <Phone size={18} className="text-primary" />
                 <div>
                   <div className="text-xs text-gray-400">24/7 SUPPORT</div>
-                  <div className="font-semibold text-dark">(+880) 1700-000000</div>
+                  <div className="font-semibold text-dark">(+880) 1758-518707</div>
                 </div>
               </div>
 

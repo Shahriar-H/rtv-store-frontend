@@ -1,5 +1,6 @@
 import './globals.css';
 import { AppProviders } from '../lib/CartContext';
+import NextTopLoader from 'nextjs-toploader';
 
 export const metadata = {
   title: { default: 'Robo Tech Valley – Best Tech Store in Bangladesh', template: '%s | Robo Tech Valley' },
@@ -19,6 +20,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <AppProviders>
+          
+          <NextTopLoader color="blue" />
           {children}
         </AppProviders>
       </body>

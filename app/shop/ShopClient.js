@@ -7,6 +7,7 @@ import ProductCard from '../../components/ProductCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import Link from 'next/link';
+import { Pagination } from '../../lib/Pagination';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default' },
@@ -64,11 +65,11 @@ export default function ShopClient() {
       setProducts(data.data?.products || data.data || []);
       setTotal(data.total || 0);
       setTotalPages(data.totalPages || 1);
-    } catch (e) { 
-      console.error('Failed to fetch products:', e); 
+    } catch (e) {
+      console.error('Failed to fetch products:', e);
       setProducts([]);
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -126,27 +127,27 @@ export default function ShopClient() {
         {/* Top bar */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
           {/* Search */}
-          <form onSubmit={e => { e.preventDefault(); updateFilter('search', searchInput); }} 
+          <form onSubmit={e => { e.preventDefault(); updateFilter('search', searchInput); }}
             className="flex-1 min-w-[200px] max-w-md flex items-center border border-gray-200 rounded-lg overflow-hidden">
             <Search size={16} className="ml-3 text-gray-400 flex-shrink-0" />
-            <input type="text" value={searchInput} onChange={e => setSearchInput(e.target.value)} 
+            <input type="text" value={searchInput} onChange={e => setSearchInput(e.target.value)}
               placeholder="Search products..." className="flex-1 px-3 py-2.5 text-sm outline-none" />
             {searchInput && (
-              <button type="button" onClick={() => { setSearchInput(''); updateFilter('search', ''); }} 
+              <button type="button" onClick={() => { setSearchInput(''); updateFilter('search', ''); }}
                 className="pr-3 text-gray-400 hover:text-dark"><X size={14} /></button>
             )}
           </form>
 
           {/* Sort */}
-          <select value={filters.sort} onChange={e => updateFilter('sort', e.target.value)} 
+          <select value={filters.sort} onChange={e => updateFilter('sort', e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary bg-white">
             {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
 
           {/* Filter toggle (mobile) */}
-          <button onClick={() => setSidebarOpen(true)} 
+          <button onClick={() => setSidebarOpen(true)}
             className="lg:hidden flex items-center gap-2 border border-gray-200 rounded-lg px-4 py-2.5 text-sm hover:border-primary">
-            <SlidersHorizontal size={15} /> Filters 
+            <SlidersHorizontal size={15} /> Filters
             {activeFilterCount > 0 && (
               <span className="bg-primary text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 {activeFilterCount}
@@ -159,7 +160,7 @@ export default function ShopClient() {
 
           {/* Active filter tags */}
           {activeFilterCount > 0 && (
-            <button onClick={clearFilters} 
+            <button onClick={clearFilters}
               className="flex items-center gap-1 text-xs text-accent border border-red-200 bg-red-50 px-2.5 py-1.5 rounded-full hover:bg-red-100">
               <X size={11} /> Clear all
             </button>
@@ -169,9 +170,9 @@ export default function ShopClient() {
         <div className="flex gap-6">
           {/* Sidebar — desktop */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
-            <FilterPanel 
-              filters={filters} 
-              updateFilter={updateFilter} 
+            <FilterPanel
+              filters={filters}
+              updateFilter={updateFilter}
               clearFilters={clearFilters}
               categories={categories}
               categoriesLoading={categoriesLoading}
@@ -187,9 +188,9 @@ export default function ShopClient() {
                   <h3 className="font-bold text-dark">Filters</h3>
                   <button onClick={() => setSidebarOpen(false)}><X size={20} /></button>
                 </div>
-                <FilterPanel 
-                  filters={filters} 
-                  updateFilter={(k,v) => { updateFilter(k,v); setSidebarOpen(false); }} 
+                <FilterPanel
+                  filters={filters}
+                  updateFilter={(k, v) => { updateFilter(k, v); setSidebarOpen(false); }}
                   clearFilters={() => { clearFilters(); setSidebarOpen(false); }}
                   categories={categories}
                   categoriesLoading={categoriesLoading}
@@ -220,35 +221,17 @@ export default function ShopClient() {
             )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <button onClick={() => updateFilter('page', filters.page - 1)} 
-                  disabled={filters.page <= 1}
-                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:border-primary hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  ← Prev
-                </button>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  // Show pages around current page
-                  const start = Math.max(1, filters.page - 2);
-                  const end = Math.min(totalPages, start + 4);
-                  const pages = [];
-                  for (let p = start; p <= end; p++) pages.push(p);
-                  return pages.map(p => (
-                    <button key={p} onClick={() => updateFilter('page', p)}
-                      className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-                        p === filters.page ? 'bg-primary text-white' : 'border border-gray-200 hover:border-primary hover:text-primary'
-                      }`}>
-                      {p}
-                    </button>
-                  ));
-                })}
-                <button onClick={() => updateFilter('page', filters.page + 1)} 
-                  disabled={filters.page >= totalPages}
-                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:border-primary hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  Next →
-                </button>
-              </div>
-            )}
+            {/* Pagination */}
+            <Pagination
+              page={filters.page} // ✅ Use filters.page instead of the standalone state
+              totalPages={totalPages}
+              total={total}
+              perPage={12} // ✅ Changed from 20 to 12 to match your fetchProducts API call
+              onPageChange={(newPage) => {
+                updateFilter('page', newPage); // ✅ This triggers the refetch via the filters state
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // ✅ Smooth scroll to top when changing pages
+              }}
+            />
           </div>
         </div>
       </div>
@@ -285,16 +268,15 @@ function FilterPanel({ filters, updateFilter, clearFilters, categories, categori
               const slug = cat.slug || '';
               const label = cat.name || cat.label || 'Category';
               const icon = cat.icon;
-              
+
               return (
                 <li key={cat._id || slug}>
-                  <button 
+                  <button
                     onClick={() => updateFilter('category', slug)}
-                    className={`w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                      filters.category === slug 
-                        ? 'bg-primary text-white font-semibold' 
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                    className={`w-full flex items-center gap-2 text-left px-3 py-2 rounded-lg text-sm transition-colors ${filters.category === slug
+                      ? 'bg-primary text-white font-semibold'
+                      : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                   >
                     {/* Optional: Show category icon if available */}
                     {/* {icon && <span className="text-xs">{icon}</span>} */}
@@ -302,7 +284,7 @@ function FilterPanel({ filters, updateFilter, clearFilters, categories, categori
                     {/* {cat.image && (
                       <img src={cat.image} alt={label} className="w-5 h-5 rounded object-cover" />
                     )} */}
-                    
+
                     <span className="flex-1">{label}</span>
                     {/* Optional: Show product count if API returns it */}
                     {cat.productCount !== undefined && (
@@ -318,21 +300,21 @@ function FilterPanel({ filters, updateFilter, clearFilters, categories, categori
 
       {/* Price range */}
       <div>
-        <button onClick={() => setPriceOpen(!priceOpen)} 
+        <button onClick={() => setPriceOpen(!priceOpen)}
           className="flex items-center justify-between w-full font-bold text-dark text-sm mb-3">
           Price Range {priceOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
         </button>
         {priceOpen && (
           <div className="space-y-3">
             <div className="flex gap-2">
-              <input type="number" value={minVal} onChange={e => setMinVal(e.target.value)} 
-                placeholder="Min $" 
+              <input type="number" value={minVal} onChange={e => setMinVal(e.target.value)}
+                placeholder="Min $"
                 className="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm outline-none focus:border-primary" />
-              <input type="number" value={maxVal} onChange={e => setMaxVal(e.target.value)} 
-                placeholder="Max $" 
+              <input type="number" value={maxVal} onChange={e => setMaxVal(e.target.value)}
+                placeholder="Max $"
                 className="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm outline-none focus:border-primary" />
             </div>
-            <button onClick={applyPrice} 
+            <button onClick={applyPrice}
               className="w-full bg-primary text-white rounded-lg py-2 text-sm font-semibold hover:bg-primary-dark transition-colors">
               Apply
             </button>
@@ -341,7 +323,7 @@ function FilterPanel({ filters, updateFilter, clearFilters, categories, categori
       </div>
 
       {/* Clear */}
-      <button onClick={clearFilters} 
+      <button onClick={clearFilters}
         className="w-full border border-gray-200 rounded-lg py-2 text-sm text-gray-500 hover:border-accent hover:text-accent transition-colors">
         Clear All Filters
       </button>
