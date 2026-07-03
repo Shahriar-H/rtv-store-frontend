@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, ShoppingCart, Heart } from 'lucide-react';
 import { useCart } from '../lib/CartContext';
+import NoImage from '../assets/no-image.png';
 
 export function StarRating({ rating, size = 13 }) {
   return (
@@ -20,7 +21,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
     return (
       <Link href={`/product/${product?.id}`} className="product-card flex gap-4 p-4 hover:shadow-md border !border-gray-300 rounded-lg transition-shadow">
         <div className="relative w-28 h-28 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
-          <Image src={product?.image || "/assets/no-image.png"} alt={product?.name} fill className="object-contain p-2" />
+          <Image src={product?.image || NoImage} alt={product?.name} fill className="object-contain p-2" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.reviews})</span></div>
@@ -46,7 +47,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
       </button>
       <Link href={`/product/${product?.id}`}>
         <div className="relative h-44 bg-gray-50 overflow-hidden">
-          {/* <Image src={product?.image} alt={product?.name} fill className="object-contain p-4 group-hover:scale-105 transition-transform duration-300" /> */}
+          <Image src={product?.image || NoImage} alt={product?.name} fill className="object-contain p-4 group-hover:scale-105 transition-transform duration-300" />
         </div>
       </Link>
       <button onClick={() => addToCart(product)} className="add-to-cart-overlay absolute bottom-0 left-0 right-0 bg-dark text-white py-2.5 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-primary transition-colors">

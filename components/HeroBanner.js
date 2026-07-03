@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { api } from '../lib/api';
+import NoImage from '../assets/no-image.png';
 
 const slides1 = [
   {
@@ -99,7 +100,7 @@ export default function HeroBanner() {
               <button className="btn-primary">Shop Now →</button>
             </div>
             <div className="relative w-56 h-56 md:w-72 md:h-72 flex-shrink-0 mt-6 md:mt-0">
-              <Image src={slide?.image || "/assets/no-image.png"} alt={slide?.name} fill className="object-contain drop-shadow-2xl" />
+              <Image src={slide?.image || NoImage} alt={slide?.name} fill className="object-contain drop-shadow-2xl" />
             </div>
           </div>
           {/* Dots */}

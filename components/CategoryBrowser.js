@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import { api } from '../lib/api';
+import NoImage from '../assets/no-image.png';
 
 const categoryImages = {
   'televisions': 'https://images.unsplash.com/photo-1593359677879-a4bb92f4834c?w=80&q=80',
@@ -53,7 +54,7 @@ export default function CategoryBrowser() {
             <div className="category-circle">
               {cat.image ? (
                 <div className="relative w-full h-full">
-                  <Image src={cat?.image || "/assets/no-image.png"} alt={cat?.name} fill className="object-cover" />
+                  <Image src={cat?.image || NoImage} alt={cat?.name} fill className="object-cover" />
                 </div>
 
               ) : (
