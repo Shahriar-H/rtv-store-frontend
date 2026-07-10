@@ -79,8 +79,8 @@ export default function PrivacyPolicy() {
             <h3 className="font-semibold text-blue-800 mb-2">Questions?</h3>
             <p className="text-blue-700">
               Contact our privacy team at{' '}
-              <a href="mailto:privacy@robostore.com" className="underline hover:text-blue-900">
-                privacy@robostore.com
+              <a href="mailto:robotechvalley@gmail.com" className="underline hover:text-blue-900">
+                robotechvalley@gmail.com
               </a>
             </p>
           </div>

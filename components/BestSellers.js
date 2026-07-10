@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { api } from '../lib/api';
+import Link from 'next/link';
 
 export default function BestSellers() {
   const [products, setProducts] = useState([]);
@@ -29,7 +30,9 @@ export default function BestSellers() {
       </div>
 
       <div className="text-center mt-8">
-        <button className="btn-outline">View All</button>
+        <Link href="/shop" className="btn-outline">
+          View All
+        </Link>
       </div>
     </section>
   );

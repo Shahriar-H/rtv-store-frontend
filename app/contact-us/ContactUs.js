@@ -15,23 +15,30 @@ export default function ContactUs() {
     {
       icon: <Mail size={20} />,
       title: 'Email Support',
-      details: 'support@robostore.com',
+      details: 'robotechvalley@gmail.com',
       subtext: 'We reply within 24 hours',
-      href: 'mailto:support@robostore.com'
+      href: 'mailto:robotechvalley@gmail.com'
     },
     {
       icon: <Phone size={20} />,
       title: 'Phone Support',
-      details: '+880 17XX-XXXXXX',
-      subtext: 'Sun-Thu, 10AM-6PM BST',
-      href: 'tel:+88017XXXXXXXX'
+      details: '+880 1758-518707',
+      subtext: 'Sat-Thu, 10AM-6PM BST',
+      href: 'tel:+8801758518707'
+    },
+    {
+      icon: <Phone size={20} />,
+      title: 'Phone Support',
+      details: '+880 1618-934047',
+      subtext: 'Sat-Thu, 10AM-6PM BST',
+      href: 'tel:+8801618934047'
     },
     {
       icon: <MapPin size={20} />,
       title: 'Visit Us',
-      details: 'House #XX, Road #XX, Dhaka 1212',
+      details: 'Level. 4,House 26/1, Road No. 04, Shialbari Graveyard, Rupnagar Rd, Dhaka 1216, Bangladesh',
       subtext: 'Bangladesh',
-      href: 'https://maps.google.com',
+      href: 'https://maps.app.goo.gl/LPbWcFnwjPKjGYhv7',
       external: true
     },
     // {
@@ -82,9 +89,8 @@ export default function ContactUs() {
             <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
               <h3 className="font-semibold text-blue-800 mb-2">🕒 Business Hours</h3>
               <ul className="text-sm text-blue-700 space-y-1">
-                <li>Sunday - Thursday: 10:00 AM - 6:00 PM</li>
-                <li>Friday - Saturday: Closed</li>
-                <li>Public Holidays: Closed</li>
+                <li>Saturday - Thursday : 10:00 AM - 6:00 PM</li>
+                <li>Friday: Closed</li>
               </ul>
             </div>
           </div>

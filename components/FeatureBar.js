@@ -1,8 +1,8 @@
 import { Truck, RefreshCcw, ShieldCheck, MessageCircle } from 'lucide-react';
 
 const features = [
-  { icon: Truck, title: 'Free Shipping', desc: 'For all orders $200' },
-  { icon: RefreshCcw, title: '1 & 1 Returns', desc: 'Cancellation after 1 day' },
+  { icon: Truck, title: 'Fast Shipping', desc: 'Accross the country' },
+  { icon: RefreshCcw, title: 'Easy Returns', desc: 'Return within 3 days' },
   { icon: ShieldCheck, title: '100% Secure Payments', desc: 'Gurantee secure payments' },
   { icon: MessageCircle, title: '24/7 Dedicated Support', desc: 'Anywhere & anytime' },
 ];

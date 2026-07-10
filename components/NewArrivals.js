@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Calendar } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { api } from '../lib/api';
+import Link from 'next/link';
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
@@ -26,7 +27,9 @@ export default function NewArrivals() {
           <p className="section-label"><Calendar size={14} /> This Week&apos;s</p>
           <h2 className="section-title mb-0">New Arrivals</h2>
         </div>
-        <button className="btn-outline text-sm py-2 px-4">View All</button>
+        <Link href="/shop" className="btn-outline text-sm py-2 px-4">
+          View All
+        </Link>
       </div>
     
       {loading ? (

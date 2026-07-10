@@ -201,10 +201,10 @@ export default function OrderDetailClient({ orderId }) {
                       <Link href={`/product/${item.productId}`} className="font-semibold text-dark text-sm hover:text-primary transition-colors line-clamp-2">
                         {item.name}
                       </Link>
-                      <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity} × ${item.price?.toFixed(2)}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">Qty: {item.quantity} × ৳{item.price?.toFixed(2)}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="font-bold text-dark">${item.subtotal?.toFixed(2)}</p>
+                      <p className="font-bold text-dark">৳{item.subtotal?.toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -220,15 +220,15 @@ export default function OrderDetailClient({ orderId }) {
               <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between text-gray-500">
                   <span>Subtotal ({order.items?.reduce((s, i) => s + i.quantity, 0)} items)</span>
-                  <span>${order.subtotal?.toFixed(2)}</span>
+                  <span>৳{order.subtotal?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
-                  <span>{order.shippingFee === 0 ? <span className="text-green-600 font-medium">Free</span> : '$' + order.shippingFee?.toFixed(2)}</span>
+                  <span>{order.shippingFee === 0 ? <span className="text-green-600 font-medium">Free</span> : '৳' + order.shippingFee?.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-dark text-base border-t pt-2.5 mt-2">
                   <span>Total</span>
-                  <span className="text-primary">${order.total?.toFixed(2)}</span>
+                  <span className="text-primary">৳{order.total?.toFixed(2)}</span>
                 </div>
               </div>
             </div>

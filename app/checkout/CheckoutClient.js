@@ -265,7 +265,7 @@ export default function CheckoutClient() {
                   <ol className="text-sm text-pink-700 space-y-1 list-decimal list-inside">
                     <li>Open bKash app and tap <strong>Send Money</strong></li>
                     <li>Enter merchant: <strong>01700-000000</strong></li>
-                    <li>Amount: <strong>${order?.total?.toFixed(2)}</strong></li>
+                    <li>Amount: <strong>৳{order?.total?.toFixed(2)}</strong></li>
                     <li>Reference: <strong>{order?.orderNumber}</strong></li>
                     <li>Complete payment and note your TxnID</li>
                   </ol>
@@ -333,14 +333,14 @@ export default function CheckoutClient() {
                 ))}
               </div>
               <div className="border-t border-gray-100 pt-4 space-y-2 text-sm">
-                <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>${(step === 3 ? order?.subtotal : cartSubtotal)?.toFixed(2)}</span></div>
+                <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>৳{(step === 3 ? order?.subtotal : cartSubtotal)?.toFixed(2)}</span></div>
                 <div className="flex justify-between text-gray-500">
                   <span>Shipping</span>
-                  <span>{(step === 3 ? order?.shippingFee : shippingFee) === 0 ? <span className="text-green-600 font-medium">Free</span> : '$' + (step === 3 ? order?.shippingFee : shippingFee)}</span>
+                  <span>{(step === 3 ? order?.shippingFee : shippingFee) === 0 ? <span className="text-green-600 font-medium">Free</span> : '৳' + (step === 3 ? order?.shippingFee : shippingFee)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-dark text-base border-t pt-2">
                   <span>Total</span>
-                  <span className="text-primary">${(step === 3 ? order?.total : cartTotal)?.toFixed(2)}</span>
+                  <span className="text-primary">৳{(step === 3 ? order?.total : cartTotal)?.toFixed(2)}</span>
                 </div>
               </div>
               {shippingFee === 0 && step !== 3 && <p className="text-green-600 text-xs mt-2 text-center">🎉 You qualify for free shipping!</p>}

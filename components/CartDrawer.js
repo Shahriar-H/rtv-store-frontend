@@ -31,7 +31,7 @@ export default function CartDrawer() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-dark line-clamp-1">{item.product.name}</p>
-                <p className="text-primary font-bold text-sm">${item.product.price}</p>
+                <p className="text-primary font-bold text-sm">৳{item.product.price}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <button onClick={() => updateQty(item.product.id, item.quantity - 1)} className="w-5 h-5 rounded bg-gray-200 flex items-center justify-center hover:bg-primary hover:text-white"><Minus size={10} /></button>
                   <span className="text-xs font-medium">{item.quantity}</span>
@@ -45,9 +45,9 @@ export default function CartDrawer() {
         {cart.length > 0 && (
           <div className="p-4 border-t bg-gray-50">
             <div className="space-y-1 mb-3 text-sm">
-              <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>${cartSubtotal.toFixed(2)}</span></div>
-              <div className="flex justify-between text-gray-500"><span>Shipping</span><span>{shippingFee === 0 ? <span className="text-green-600">Free</span> : '$' + shippingFee}</span></div>
-              <div className="flex justify-between font-bold text-dark pt-1 border-t"><span>Total</span><span className="text-primary">${cartTotal.toFixed(2)}</span></div>
+              <div className="flex justify-between text-gray-500"><span>Subtotal</span><span>৳{cartSubtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between text-gray-500"><span>Shipping</span><span>{shippingFee === 0 ? <span className="text-green-600">Free</span> : '৳' + shippingFee}</span></div>
+              <div className="flex justify-between font-bold text-dark pt-1 border-t"><span>Total</span><span className="text-primary">৳    {cartTotal.toFixed(2)}</span></div>
             </div>
             <Link href="/checkout" onClick={() => setCartOpen(false)} className="btn-primary w-full text-center block mb-2">Proceed to Checkout</Link>
             <Link href="/cart" onClick={() => setCartOpen(false)} className="block text-center text-sm text-gray-500 hover:text-dark py-1">View Cart</Link>

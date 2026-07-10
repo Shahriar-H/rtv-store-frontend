@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { MapPin, Phone, Mail, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import logo from '../assets/logo.png';
 import Image from 'next/image';
 
@@ -26,18 +26,27 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone size={15} className="text-primary flex-shrink-0" />
-                <span>(+880) 1758-518707</span>
+                <div>
+                  <p>(+880) 1758-518707</p>
+                  <p>(+880) 1618-934047</p>
+                </div>
+                
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={15} className="text-primary flex-shrink-0" />
-                <span>support@robotechvalley.com</span>
+                <span>robotechvalley@gmail.com</span>
               </div>
             </div>
             <div className="flex gap-3 mt-5">
-              {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                <button key={i} className="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary transition-colors">
-                  <Icon size={14} />
-                </button>
+              {[
+                { icon: <Facebook size={14} />, href: 'https://www.facebook.com/robotechvalley', external: true },
+                { icon: <Youtube size={14} />, href: 'https://www.youtube.com/c/RoboTechValley', external: true },
+                { icon: <Instagram size={14} />, href: 'https://www.instagram.com/p/DWvZREIEmGW/', external: true },
+                { icon: <Linkedin size={14} />, href: 'https://bd.linkedin.com/company/robo-tech-valley', external: true },
+              ].map((Icon, i) => (
+                <Link href={Icon.href} target={Icon.external ? '_blank' : '_self'} key={i} className="w-8 h-8 border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary transition-colors">
+                  {Icon?.icon}
+                </Link>
               ))}
             </div>
           </div>

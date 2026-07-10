@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import imageEquip from '../assets/images-equip.jpg';
+import Link from 'next/link';
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -29,9 +31,9 @@ export default function CountdownDeal() {
           <div className="flex-1">
             <p className="text-primary font-semibold text-sm mb-2">Don&apos;t Miss!!</p>
             <h2 className="text-dark text-2xl md:text-3xl font-bold mb-2">
-              Enhance Your Music Experience
+              Enhance Your Robotics Experience
             </h2>
-            <p className="text-gray-500 text-sm mb-6">The Havit H206d is a wired PC headphone.</p>
+            <p className="text-gray-500 text-sm mb-6">Find the Best Robotics Equipment at Unbeatable Prices</p>
 
             {/* Countdown */}
             <div className="flex gap-3 mb-6 flex-wrap">
@@ -48,13 +50,15 @@ export default function CountdownDeal() {
               ))}
             </div>
 
-            <button className="btn-primary">Check it Out!</button>
+            <Link href="/shop" className="btn-primary">
+              Check it Out!
+            </Link>
           </div>
 
           <div className="relative w-64 h-64 md:w-80 md:h-80 flex-shrink-0">
             <Image
-              src="https://images.unsplash.com/photo-1599669454699-248893623440?w=400&q=80"
-              alt="Headphone Deal"
+              src={imageEquip}
+              alt="Deal"
               fill
               className="object-contain drop-shadow-xl"
             />

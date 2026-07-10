@@ -308,10 +308,10 @@ function FilterPanel({ filters, updateFilter, clearFilters, categories, categori
           <div className="space-y-3">
             <div className="flex gap-2">
               <input type="number" value={minVal} onChange={e => setMinVal(e.target.value)}
-                placeholder="Min $"
+                placeholder="Min ৳"
                 className="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm outline-none focus:border-primary" />
               <input type="number" value={maxVal} onChange={e => setMaxVal(e.target.value)}
-                placeholder="Max $"
+                placeholder="Max ৳"
                 className="w-full border border-gray-200 rounded-lg px-2 py-2 text-sm outline-none focus:border-primary" />
             </div>
             <button onClick={applyPrice}

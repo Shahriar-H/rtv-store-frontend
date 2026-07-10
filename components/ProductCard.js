@@ -27,8 +27,8 @@ export default function ProductCard({ product, layout = 'grid' }) {
           <div className="flex items-center gap-2 mb-1"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.reviews})</span></div>
           <p className="font-medium text-dark text-sm mb-2 line-clamp-2">{product?.name}</p>
           <div className="flex items-center gap-2">
-            <span className="text-accent font-bold">${product?.price}</span>
-            {product?.originalPrice && <span className="text-gray-400 text-sm line-through">${product?.originalPrice}</span>}
+            <span className="text-accent font-bold">৳{product?.price}</span>
+            {product?.originalPrice && <span className="text-gray-400 text-sm line-through">৳{product?.originalPrice}</span>}
           </div>
         </div>
       </Link>
@@ -57,8 +57,8 @@ export default function ProductCard({ product, layout = 'grid' }) {
         <div className="flex items-center gap-1.5 mb-1.5"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.reviews})</span></div>
         <p className="font-medium text-dark text-sm mb-2 line-clamp-2 leading-snug">{product?.name}</p>
         <div className="flex items-center gap-2">
-          <span className="text-accent font-bold text-base">${product?.price}</span>
-          {product?.originalPrice && <span className="text-gray-400 text-sm line-through">${product?.originalPrice}</span>}
+          <span className="text-accent font-bold text-base">৳{product?.price}</span>
+          {product?.originalPrice && <span className="text-gray-400 text-sm line-through">৳{product?.originalPrice}</span>}
         </div>
       </Link>
     </div>

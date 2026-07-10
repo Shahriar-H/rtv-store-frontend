@@ -91,7 +91,7 @@ export default function AccountClient() {
                   { label: 'Total Orders', value: orders.length, color: 'text-primary' },
                   { label: 'Delivered', value: deliveredCount, color: 'text-green-600' },
                   { label: 'Pending', value: pendingCount, color: 'text-amber-600' },
-                  { label: 'Total Spent', value: '$' + totalSpent.toFixed(2), color: 'text-dark' },
+                  { label: 'Total Spent', value: '৳' + totalSpent.toFixed(2), color: 'text-dark' },
                 ].map(stat => (
                   <div key={stat.label} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
                     <span className="text-sm text-gray-500">{stat.label}</span>
@@ -203,7 +203,7 @@ export default function AccountClient() {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <p className="font-bold text-primary text-sm">${order.total?.toFixed(2)}</p>
+                        <p className="font-bold text-primary text-sm">৳{order.total?.toFixed(2)}</p>
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[order.status] || 'bg-gray-100 text-gray-600'}`}>
                           {order.status?.replace(/_/g, ' ')}
                         </span>

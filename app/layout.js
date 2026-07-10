@@ -4,7 +4,7 @@ import NextTopLoader from 'nextjs-toploader';
 
 export const metadata = {
   title: { default: 'Robo Tech Valley – Best Tech Store in Bangladesh', template: '%s | Robo Tech Valley' },
-  description: 'Shop the latest electronics, smartphones, laptops, and gadgets at unbeatable prices. Free shipping over $200. bKash & COD accepted.',
+  description: 'Shop the latest electronics, smartphones, laptops, and gadgets at unbeatable prices. bKash & COD accepted.',
   keywords: ['electronics', 'tech store', 'smartphones', 'laptops', 'bKash', 'Bangladesh', 'online shopping'],
   openGraph: {
     title: 'Robo Tech Valley – Best Tech Store',

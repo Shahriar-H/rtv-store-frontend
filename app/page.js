@@ -12,7 +12,7 @@ import Footer from '../components/Footer';
 
 export const metadata = {
   title: 'Robo Tech Valley — Best Tech Store in Bangladesh',
-  description: 'Shop the latest electronics, smartphones, laptops, and gadgets at unbeatable prices. bKash & COD accepted. Free shipping over $200.',
+  description: 'Shop the latest electronics, smartphones, laptops, and gadgets at unbeatable prices. bKash & COD accepted.',
 };
 
 export default function HomePage() {
@@ -26,8 +26,8 @@ export default function HomePage() {
       <PromoBanner />
       <BestSellers />
       <CountdownDeal />
-      <Testimonials />
-      <Newsletter />
+      {/* <Testimonials />
+      <Newsletter /> */}
       <Footer />
     </main>
   );

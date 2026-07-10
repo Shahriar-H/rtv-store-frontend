@@ -48,15 +48,15 @@ export default function CartPageClient() {
                         <Link href={`/product/${item.product.id}`} className="font-semibold text-dark text-sm hover:text-primary transition-colors line-clamp-2">{item.product.name}</Link>
                         {item.product.badge && <span className="inline-block mt-1 text-xs bg-red-100 text-accent px-2 py-0.5 rounded">{item.product.badge}</span>}
                         {/* Mobile price */}
-                        <p className="md:hidden text-primary font-bold text-sm mt-1">${item.product.price}</p>
+                        <p className="md:hidden text-primary font-bold text-sm mt-1">৳{item.product.price}</p>
                       </div>
                     </div>
 
                     {/* Price - desktop */}
                     <div className="hidden md:flex md:col-span-2 justify-center">
                       <div>
-                        <p className="font-semibold text-dark text-sm text-center">${item.product.price}</p>
-                        {item.product.originalPrice && <p className="text-xs text-gray-400 line-through text-center">${item.product.originalPrice}</p>}
+                        <p className="font-semibold text-dark text-sm text-center">৳{item.product.price}</p>
+                        {item.product.originalPrice && <p className="text-xs text-gray-400 line-through text-center">৳{item.product.originalPrice}</p>}
                       </div>
                     </div>
 
@@ -75,7 +75,7 @@ export default function CartPageClient() {
 
                     {/* Total + remove */}
                     <div className="col-span-5 md:col-span-2 flex items-center justify-end gap-3">
-                      <p className="font-bold text-dark text-sm">${(item.product.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold text-dark text-sm">৳{(item.product.price * item.quantity).toFixed(2)}</p>
                       <button onClick={() => removeFromCart(item.product.id)} className="text-gray-300 hover:text-accent transition-colors">
                         <Trash2 size={16} />
                       </button>
@@ -103,21 +103,21 @@ export default function CartPageClient() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-gray-500">
                     <span>Subtotal ({cart.reduce((s,i) => s+i.quantity, 0)} items)</span>
-                    <span>${cartSubtotal.toFixed(2)}</span>
+                    <span>৳{cartSubtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-gray-500">
                     <span>Shipping</span>
-                    <span>{shippingFee === 0 ? <span className="text-green-600 font-semibold">Free</span> : '$' + shippingFee}</span>
+                    <span>{shippingFee === 0 ? <span className="text-green-600 font-semibold">Free</span> : '৳' + shippingFee}</span>
                   </div>
                   {shippingFee > 0 && (
                     <div className="text-xs text-gray-400 bg-blue-50 rounded-lg p-2.5 flex items-start gap-2">
                       <Truck size={13} className="text-primary mt-0.5 flex-shrink-0" />
-                      <span>Add <strong>${(200 - cartSubtotal).toFixed(2)}</strong> more for free shipping!</span>
+                      <span>Add <strong>৳{(200 - cartSubtotal).toFixed(2)}</strong> more for free shipping!</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-dark text-base border-t pt-3">
                     <span>Total</span>
-                    <span className="text-primary">${cartTotal.toFixed(2)}</span>
+                    <span className="text-primary">৳{cartTotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -139,7 +139,7 @@ export default function CartPageClient() {
               <div className="bg-gray-50 rounded-2xl p-4 space-y-2.5 text-sm text-gray-500">
                 <div className="flex items-center gap-2"><span>🔒</span> Secure checkout</div>
                 <div className="flex items-center gap-2"><span>📱</span> bKash & COD accepted</div>
-                <div className="flex items-center gap-2"><span>🚚</span> Free delivery over $200</div>
+                <div className="flex items-center gap-2"><span>🚚</span> Free delivery over ৳200</div>
                 <div className="flex items-center gap-2"><span>↩️</span> 7-day easy returns</div>
               </div>
             </div>

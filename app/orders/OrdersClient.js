@@ -93,7 +93,7 @@ export default function OrdersClient() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Total</p>
-                      <p className="font-bold text-primary">${order.total?.toFixed(2)}</p>
+                      <p className="font-bold text-primary">৳{order.total?.toFixed(2)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Payment</p>
@@ -121,7 +121,7 @@ export default function OrdersClient() {
                         </div>
                         <div>
                           <p className="text-xs font-medium text-dark line-clamp-1 max-w-[120px]">{item.name}</p>
-                          <p className="text-xs text-gray-400">Qty: {item.quantity} × ${item.price}</p>
+                          <p className="text-xs text-gray-400">Qty: {item.quantity} × ৳{item.price}</p>
                         </div>
                       </div>
                     ))}
