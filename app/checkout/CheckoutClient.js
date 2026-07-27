@@ -328,7 +328,7 @@ export default function CheckoutClient() {
                       <p className="text-xs font-medium text-dark line-clamp-1">{item.product?.name || item.name}</p>
                       <p className="text-xs text-gray-400">Qty: {item.quantity}</p>
                     </div>
-                    <span className="text-sm font-semibold">${((item.product?.price || item.price) * item.quantity).toFixed(2)}</span>
+                    <span className="text-sm font-semibold">৳{((item.product?.price || item.price) * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
