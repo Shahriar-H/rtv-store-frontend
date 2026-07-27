@@ -231,7 +231,7 @@ export default function CheckoutClient() {
                     </div>
                     {payment.method === 'cod' && (
                       <div className="mt-3 bg-white rounded-lg p-3 border border-blue-200">
-                        <p className="text-xs text-gray-600">Pay <strong>${cartTotal.toFixed(2)}</strong> in cash to our delivery agent. Available across Bangladesh.</p>
+                        <p className="text-xs text-gray-600">Pay <strong>৳{cartTotal.toFixed(2)}</strong> in cash to our delivery agent. Available across Bangladesh.</p>
                       </div>
                     )}
                   </label>
