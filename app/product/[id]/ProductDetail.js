@@ -135,7 +135,7 @@ export default function ProductDetail({ product }) {
             </div>
 
             {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-3 mb-6 hidden">
+            <div className="grid-cols-3 gap-3 mb-6 hidden">
               {[
                 { icon: Truck, text: 'Free Shipping over $200' },
                 { icon: RefreshCcw, text: '7-Day Easy Returns' },

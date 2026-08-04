@@ -243,11 +243,11 @@ export default function OrderDetailClient({ orderId }) {
                   {order.paymentMethod === 'bkash' ? <Smartphone size={16} className="text-pink-600" /> : <CreditCard size={16} className="text-primary" />}
                   <span className="font-semibold capitalize">{order.paymentMethod === 'bkash' ? 'bKash' : 'Cash on Delivery'}</span>
                 </div>
-                {order.paymentMethod === 'bkash' && order.bkashNumber && (
-                  <p className="text-gray-500">Number: <span className="font-medium">{order.bkashNumber}</span></p>
-                )}
-                {order.bkashTransactionId && (
-                  <p className="text-gray-500 font-mono text-xs bg-gray-50 px-2 py-1 rounded">TxnID: {order.bkashTransactionId}</p>
+                {order.paymentMethod === 'bkash' && order.bkashTrxID && (
+                  <div>
+                    <span className="text-gray-400">bKash TrxID</span>
+                    <p className="font-mono text-xs bg-gray-50 px-2 py-1 rounded inline-block">{order.bkashTrxID}</p>
+                  </div>
                 )}
                 <div className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${order.status === 'payment_pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}`}>
                   {order.status === 'payment_pending' ? '⏳ Pending' : '✓ Paid'}

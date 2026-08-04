@@ -18,7 +18,7 @@ export default function CheckoutClient() {
   const { cart, cartSubtotal, cartTotal, shippingFee, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
-  const [step, setStep] = useState(1); // 1=shipping, 2=payment, 3=confirm
+  const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,20 +35,16 @@ export default function CheckoutClient() {
   });
 
   const [payment, setPayment] = useState({
-    method: 'cod', // 'bkash' | 'cod'
-    bkashNumber: '',
-    bkashTransactionId: '',
+    method: 'cod',
   });
-
-  const [bkashStep, setBkashStep] = useState(1); // 1=enter number, 2=confirm txn
 
   useEffect(() => {
     if (!user) router.push('/account/login?redirect=/checkout');
   }, [user, router]);
 
   useEffect(() => {
-    if (cart.length === 0 && !order) router.push('/');
-  }, [cart, order, router]);
+    if (cart.length === 0) router.push('/');
+  }, [cart, router]);
 
   const handleShippingChange = e => setShipping(p => ({ ...p, [e.target.name]: e.target.value }));
   const handlePaymentChange = e => setPayment(p => ({ ...p, [e.target.name]: e.target.value }));
@@ -56,44 +52,66 @@ export default function CheckoutClient() {
   const handlePlaceOrder = async () => {
     if (!user) { router.push('/account/login'); return; }
     setLoading(true); setError('');
+
     try {
+      if (payment.method === 'bkash') {
+        const res = await api.bkashCreatePayment({
+          items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+          shippingAddress: {
+            fullName: shipping.fullName,
+            email: shipping.email,
+            phone: shipping.phone,
+            street: shipping.street,
+            city: shipping.city,
+            state: shipping.state,
+            zipCode: shipping.zipCode,
+            country: shipping.country,
+          },
+          customer: {
+            name: user.name,
+            email: user.email,
+            phone: shipping.phone,
+          },
+        });
+
+        const payload = res?.data || res;
+        const bkashURL = payload?.bkashURL;
+        const orderId = payload?.orderId;
+
+        if (!bkashURL || !orderId) {
+          throw new Error(res?.message || 'bKash did not return a checkout URL');
+        }
+
+        try { localStorage.setItem('lastBkashOrderId', orderId); } catch {}
+        window.location.href = bkashURL;
+        return;
+      }
+
       const newOrder = await api.createOrder({
         items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity })),
-        shippingAddress: shipping,
-        user: user.id,
+        shippingAddress: {
+          fullName: shipping.fullName,
+          email: shipping.email,
+          phone: shipping.phone,
+          street: shipping.street,
+          city: shipping.city,
+          state: shipping.state,
+          zipCode: shipping.zipCode,
+          country: shipping.country,
+        },
         paymentMethod: payment.method,
-        bkashNumber: payment.bkashNumber,
       });
-      console.log(newOrder);
-      
-      if (payment.method === 'bkash') {
-        setOrder(newOrder?.data);
-        setBkashStep(2);
-        setStep(2.5); // bkash confirm step
-      } else {
-        setOrder(newOrder?.data);
-        clearCart();
-        setStep(3);
-      }
+
+      const created = newOrder?.data || newOrder;
+      setOrder(created);
+      clearCart();
+      setStep(2);
     } catch (err) {
       setError(err.message || 'Failed to place order');
     } finally { setLoading(false); }
   };
 
-  const handleBkashConfirm = async () => {
-    if (!payment.bkashTransactionId.trim()) { setError('Please enter your bKash transaction ID'); return; }
-    setLoading(true); setError('');
-    try {
-      const updated = await api.confirmBkash(order?.id, payment.bkashTransactionId);
-      setOrder(updated);
-      clearCart();
-      setStep(3);
-    } catch (err) {
-      setError(err.message || 'Failed to confirm payment');
-    } finally { setLoading(false); }
-  };
-
-  if (!user || cart.length === 0 && !order) return null;
+  if (!user || cart.length === 0) return null;
 
   return (
     <main>
@@ -112,8 +130,8 @@ export default function CheckoutClient() {
         <div className="flex items-center justify-center mb-10">
           {['Shipping', 'Payment', 'Complete'].map((label, i) => {
             const stepNum = i + 1;
-            const isActive = step === stepNum || (step === 2.5 && stepNum === 2);
-            const isDone = step > stepNum || (step === 2.5 && stepNum === 1) || (step === 3 && stepNum <= 2);
+            const isActive = step === stepNum;
+            const isDone = step > stepNum;
             return (
               <div key={label} className="flex items-center">
                 <div className="flex flex-col items-center">
@@ -163,7 +181,6 @@ export default function CheckoutClient() {
                     <label className="text-sm font-medium text-dark mb-1.5 block">State <span className="text-accent">*</span></label>
                     <input list="divisions" name="state" value={shipping.state} onChange={handleShippingChange} placeholder="Select division" required
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:border-primary" />
-                    
                   </div>
                   <div>
                     <label className="text-sm font-medium text-dark mb-1.5 block">City <span className="text-accent">*</span></label>
@@ -198,23 +215,10 @@ export default function CheckoutClient() {
                       </div>
                       <div>
                         <p className="font-bold text-dark">bKash</p>
-                        <p className="text-xs text-gray-500">Pay via bKash mobile banking</p>
+                        <p className="text-xs text-gray-500">You&apos;ll be redirected to bKash to complete payment</p>
                       </div>
                       <span className="ml-auto bg-pink-600 text-white text-xs px-2 py-0.5 rounded font-bold">POPULAR</span>
                     </div>
-                    {payment.method === 'bkash' && (
-                      <div className="mt-4 bg-white rounded-lg p-4 border border-pink-200">
-                        <div className="bg-pink-600 text-white rounded-lg p-3 mb-3 text-center">
-                          <p className="text-xs mb-1">Send to this bKash number</p>
-                          <p className="text-xl font-bold tracking-widest">01700-000000</p>
-                          <p className="text-xs mt-1">Amount: <strong>${cartTotal.toFixed(2)}</strong></p>
-                        </div>
-                        <p className="text-xs text-gray-500 mb-3">Send money → Personal → Enter number above → Enter amount → Use reference: your name</p>
-                        <label className="text-sm font-medium text-dark mb-1.5 block">Your bKash Number <span className="text-accent">*</span></label>
-                        <input type="tel" name="bkashNumber" value={payment.bkashNumber} onChange={handlePaymentChange} placeholder="01XXXXXXXXX"
-                          className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm outline-none focus:border-pink-500" />
-                      </div>
-                    )}
                   </label>
 
                   {/* COD */}
@@ -241,53 +245,19 @@ export default function CheckoutClient() {
 
                 <div className="flex gap-3">
                   <button onClick={() => setStep(1)} className="flex-1 btn-outline py-3 text-center">← Back</button>
-                  <button onClick={handlePlaceOrder} disabled={loading || (payment.method === 'bkash' && !payment.bkashNumber)}
+                  <button onClick={handlePlaceOrder} disabled={loading}
                     className="flex-1 btn-primary py-3 text-center disabled:opacity-60">
-                    {loading ? 'Placing Order...' : payment.method === 'bkash' ? 'Place Order & Confirm bKash →' : 'Place Order →'}
+                    {loading
+                      ? 'Redirecting to bKash...'
+                      : payment.method === 'bkash'
+                        ? 'Pay with bKash →'
+                        : 'Place Order →'}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* STEP 2.5: bKash transaction confirm */}
-            {step === 2.5 && (
-              <div className="bg-white rounded-2xl border border-gray-100 p-6">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Smartphone size={28} className="text-pink-600" />
-                  </div>
-                  <h2 className="text-xl font-bold text-dark">Confirm bKash Payment</h2>
-                  <p className="text-gray-500 text-sm mt-1">Order #{order?.orderNumber}</p>
-                </div>
-
-                <div className="bg-pink-50 border border-pink-200 rounded-xl p-4 mb-6">
-                  <p className="text-sm text-pink-800 font-medium mb-2">Payment Instructions:</p>
-                  <ol className="text-sm text-pink-700 space-y-1 list-decimal list-inside">
-                    <li>Open bKash app and tap <strong>Send Money</strong></li>
-                    <li>Enter merchant: <strong>01700-000000</strong></li>
-                    <li>Amount: <strong>৳{order?.total?.toFixed(2)}</strong></li>
-                    <li>Reference: <strong>{order?.orderNumber}</strong></li>
-                    <li>Complete payment and note your TxnID</li>
-                  </ol>
-                </div>
-
-                <div className="mb-6">
-                  <label className="text-sm font-medium text-dark mb-1.5 block">bKash Transaction ID <span className="text-accent">*</span></label>
-                  <input type="text" name="bkashTransactionId" value={payment.bkashTransactionId} onChange={handlePaymentChange}
-                    placeholder="e.g. 8D6XXXXXX"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm outline-none focus:border-pink-500 font-mono uppercase" />
-                  <p className="text-xs text-gray-400 mt-1">Find the TxnID in your bKash SMS confirmation</p>
-                </div>
-
-                {error && <p className="text-accent text-sm mb-4 flex items-center gap-1"><AlertCircle size={14} /> {error}</p>}
-
-                <button onClick={handleBkashConfirm} disabled={loading} className="w-full bg-pink-600 text-white py-3 rounded-xl font-semibold hover:bg-pink-700 transition-colors disabled:opacity-60">
-                  {loading ? 'Verifying...' : 'Confirm Payment'}
-                </button>
-              </div>
-            )}
-
-            {/* STEP 3: Success */}
+            {/* STEP 3: Success (COD only) */}
             {step === 3 && order && (
               <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -299,15 +269,15 @@ export default function CheckoutClient() {
 
                 <div className="bg-gray-50 rounded-xl p-5 text-left mb-6">
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="text-gray-400">Payment</span><p className="font-semibold capitalize">{order.paymentMethod === 'bkash' ? '✓ bKash Confirmed' : 'Cash on Delivery'}</p></div>
-                    <div><span className="text-gray-400">Total</span><p className="font-semibold text-primary">${order.total?.toFixed(2)}</p></div>
-                    <div><span className="text-gray-400">Delivery to</span><p className="font-semibold">{order.shippingAddress?.city}, {order.shippingAddress?.division}</p></div>
+                    <div><span className="text-gray-400">Payment</span><p className="font-semibold">Cash on Delivery</p></div>
+                    <div><span className="text-gray-400">Total</span><p className="font-semibold text-primary">৳{order.total?.toFixed(2)}</p></div>
+                    <div><span className="text-gray-400">Delivery to</span><p className="font-semibold">{order.shippingAddress?.city}</p></div>
                     <div><span className="text-gray-400">Est. Delivery</span><p className="font-semibold">{new Date(order.estimatedDelivery).toLocaleDateString('en-BD', { day: 'numeric', month: 'short' })}</p></div>
                   </div>
                 </div>
 
                 <div className="flex gap-3 justify-center">
-                  <Link href={`/orders/${order.id}`} className="btn-primary px-6 py-2.5">Track Order</Link>
+                  <Link href={`/orders/${order.id || order._id}`} className="btn-primary px-6 py-2.5">Track Order</Link>
                   <Link href="/" className="btn-outline px-6 py-2.5">Continue Shopping</Link>
                 </div>
               </div>
@@ -319,7 +289,7 @@ export default function CheckoutClient() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6 sticky top-24">
               <h3 className="font-bold text-dark mb-4">Order Summary</h3>
               <div className="space-y-3 mb-5 max-h-64 overflow-y-auto">
-                {(step === 3 ? order?.items?.map(i => ({ product: { id: i.productId, name: i.name, image: i.image, price: i.price }, quantity: i.quantity })) : cart).map((item, i) => (
+                {(step === 3 ? (order?.items || []).map(i => ({ product: { id: i.product, name: i.name, image: i.image, price: i.price }, quantity: i.quantity })) : cart).map((item, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className="relative w-12 h-12 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
                       <Image src={item.product?.image || item.image} alt={item.product?.name || item.name} fill className="object-contain" />

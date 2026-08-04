@@ -46,7 +46,7 @@ const sideDeals1 = [
 ];
 
 export default function HeroBanner() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(1);
   const [products, setProducts] = useState([]);
   const [slides, setslides] = useState([]);
   const [loading, setLoading] = useState(true);
