@@ -4,9 +4,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CheckCircle, XCircle, AlertCircle, ArrowLeft, Phone, Mail, Smartphone, Package, Truck } from 'lucide-react';
-import Navbar from '../../../components/Navbar';
-import Footer from '../../../components/Footer';
-import { api } from '../../../lib/api';
+import Navbar from '../../../../components/Navbar';
+import Footer from '../../../../components/Footer';
+import { api } from '../../../../lib/api';
 
 function statusFromParams(raw) {
   if (!raw) return null;

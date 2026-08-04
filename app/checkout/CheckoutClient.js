@@ -1,18 +1,31 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, CreditCard, Truck, CheckCircle, AlertCircle, Phone, MapPin, User, Mail, Smartphone } from 'lucide-react';
+import { ChevronRight, CreditCard, Truck, CheckCircle, AlertCircle, Phone, MapPin, User, Mail, Smartphone, Info } from 'lucide-react';
 import { useCart } from '../../lib/CartContext';
 import { useAuth } from '../../lib/CartContext';
-import { api } from '../../lib/api';
+import { api, ApiError } from '../../lib/api';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 
-const STEPS = ['Cart', 'Shipping', 'Payment', 'Confirm'];
+const FALLBACK_STATUSES = new Set([0, 502, 503]);
 
-const DIVISIONS = ['Dhaka', 'Chattogram', 'Sylhet', 'Rajshahi', 'Khulna', 'Barisal', 'Rangpur', 'Mymensingh'];
+function isFallbackEligible(err) {
+  if (!err) return false;
+  if (err instanceof ApiError && FALLBACK_STATUSES.has(err.status)) return true;
+  if (FALLBACK_STATUSES.has(err.status)) return true;
+  const code = String(err.code || '').toUpperCase();
+  return (
+    code === 'NETWORK_ERROR' ||
+    code === 'ENOTFOUND' ||
+    code === 'ECONNREFUSED' ||
+    code === 'ECONNRESET' ||
+    code === 'ETIMEDOUT' ||
+    code === 'BKASH_NOT_CONFIGURED'
+  );
+}
 
 export default function CheckoutClient() {
   const { cart, cartSubtotal, cartTotal, shippingFee, clearCart } = useCart();
@@ -22,6 +35,10 @@ export default function CheckoutClient() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
+  const [bkashAvailable, setBkashAvailable] = useState(true);
+  const [bkashReason, setBkashReason] = useState('');
+  const healthCheckedRef = useRef(false);
 
   const [shipping, setShipping] = useState({
     fullName: user?.name || '',
@@ -46,66 +63,108 @@ export default function CheckoutClient() {
     if (cart.length === 0) router.push('/');
   }, [cart, router]);
 
+  useEffect(() => {
+    if (healthCheckedRef.current) return;
+    healthCheckedRef.current = true;
+    api.bkashHealth()
+      .then((res) => {
+        const data = res?.data || res;
+        if (data?.configured === false) {
+          setBkashAvailable(false);
+          setBkashReason('bKash payments are not configured on the server.');
+        } else {
+          setBkashAvailable(true);
+        }
+      })
+      .catch(() => {
+        setBkashAvailable(true);
+      });
+  }, []);
+
   const handleShippingChange = e => setShipping(p => ({ ...p, [e.target.name]: e.target.value }));
   const handlePaymentChange = e => setPayment(p => ({ ...p, [e.target.name]: e.target.value }));
+
+  const buildShippingPayload = () => ({
+    fullName: shipping.fullName,
+    email: shipping.email,
+    phone: shipping.phone,
+    street: shipping.street,
+    city: shipping.city,
+    state: shipping.state,
+    zipCode: shipping.zipCode,
+    country: shipping.country,
+  });
+
+  const buildItemPayload = () => cart.map(i => ({ productId: i.product.id, quantity: i.quantity }));
+
+  const placeCodOrder = async () => {
+    const newOrder = await api.createOrder({
+      items: buildItemPayload(),
+      shippingAddress: buildShippingPayload(),
+      paymentMethod: 'cod',
+    });
+    const created = newOrder?.data || newOrder;
+    setOrder(created);
+    clearCart();
+    setStep(3);
+  };
 
   const handlePlaceOrder = async () => {
     if (!user) { router.push('/account/login'); return; }
     setLoading(true); setError('');
+    setInfo('');
+
+    if (payment.method === 'bkash' && !bkashAvailable) {
+      setInfo('bKash is temporarily unavailable. Your order has been placed with Cash on Delivery instead.');
+      setPayment(p => ({ ...p, method: 'cod' }));
+      try {
+        await placeCodOrder();
+      } catch (err) {
+        setError(err.message || 'Failed to place COD order');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     try {
       if (payment.method === 'bkash') {
-        const res = await api.bkashCreatePayment({
-          items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity })),
-          shippingAddress: {
-            fullName: shipping.fullName,
-            email: shipping.email,
-            phone: shipping.phone,
-            street: shipping.street,
-            city: shipping.city,
-            state: shipping.state,
-            zipCode: shipping.zipCode,
-            country: shipping.country,
-          },
-          customer: {
-            name: user.name,
-            email: user.email,
-            phone: shipping.phone,
-          },
-        });
+        try {
+          const res = await api.bkashCreatePayment({
+            items: buildItemPayload(),
+            shippingAddress: buildShippingPayload(),
+            customer: {
+              name: user.name,
+              email: user.email,
+              phone: shipping.phone,
+            },
+          });
 
-        const payload = res?.data || res;
-        const bkashURL = payload?.bkashURL;
-        const orderId = payload?.orderId;
+          const payload = res?.data || res;
+          const bkashURL = payload?.bkashURL;
+          const orderId = payload?.orderId;
 
-        if (!bkashURL || !orderId) {
-          throw new Error(res?.message || 'bKash did not return a checkout URL');
+          if (!bkashURL || !orderId) {
+            throw new Error(res?.message || 'bKash did not return a checkout URL');
+          }
+
+          try { localStorage.setItem('lastBkashOrderId', orderId); } catch {}
+          window.location.href = bkashURL;
+          return;
+        } catch (err) {
+          if (isFallbackEligible(err)) {
+            setBkashAvailable(false);
+            setBkashReason(err.message || 'bKash gateway is unreachable.');
+            setInfo('bKash is having trouble connecting. Your order has been placed with Cash on Delivery instead.');
+            setPayment(p => ({ ...p, method: 'cod' }));
+            await placeCodOrder();
+            return;
+          }
+          throw err;
         }
-
-        try { localStorage.setItem('lastBkashOrderId', orderId); } catch {}
-        window.location.href = bkashURL;
-        return;
       }
 
-      const newOrder = await api.createOrder({
-        items: cart.map(i => ({ productId: i.product.id, quantity: i.quantity })),
-        shippingAddress: {
-          fullName: shipping.fullName,
-          email: shipping.email,
-          phone: shipping.phone,
-          street: shipping.street,
-          city: shipping.city,
-          state: shipping.state,
-          zipCode: shipping.zipCode,
-          country: shipping.country,
-        },
-        paymentMethod: payment.method,
-      });
-
-      const created = newOrder?.data || newOrder;
-      setOrder(created);
-      clearCart();
-      setStep(2);
+      await placeCodOrder();
     } catch (err) {
       setError(err.message || 'Failed to place order');
     } finally { setLoading(false); }
@@ -205,19 +264,46 @@ export default function CheckoutClient() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6">
                 <h2 className="text-xl font-bold text-dark mb-6 flex items-center gap-2"><CreditCard size={20} className="text-primary" /> Payment Method</h2>
 
+                {info && (
+                  <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg flex items-start gap-2">
+                    <Info size={16} className="flex-shrink-0 mt-0.5" />
+                    <span>{info}</span>
+                  </div>
+                )}
+
                 <div className="space-y-4 mb-6">
                   {/* bKash */}
-                  <label className={`block border-2 rounded-xl p-4 cursor-pointer transition-colors ${payment.method === 'bkash' ? 'border-pink-500 bg-pink-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                  <label
+                    title={bkashAvailable ? '' : bkashReason}
+                    className={`block border-2 rounded-xl p-4 transition-colors ${
+                      !bkashAvailable
+                        ? 'border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed'
+                        : payment.method === 'bkash'
+                          ? 'border-pink-500 bg-pink-50 cursor-pointer'
+                          : 'border-gray-200 hover:border-gray-300 cursor-pointer'
+                    }`}>
                     <div className="flex items-center gap-3">
-                      <input type="radio" name="method" value="bkash" checked={payment.method === 'bkash'} onChange={handlePaymentChange} className="w-4 h-4 accent-pink-500" />
-                      <div className="w-12 h-12 bg-pink-600 rounded-lg flex items-center justify-center">
+                      <input
+                        type="radio"
+                        name="method"
+                        value="bkash"
+                        checked={payment.method === 'bkash'}
+                        onChange={handlePaymentChange}
+                        disabled={!bkashAvailable}
+                        className="w-4 h-4 accent-pink-500 disabled:cursor-not-allowed"
+                      />
+                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${bkashAvailable ? 'bg-pink-600' : 'bg-gray-300'}`}>
                         <Smartphone size={22} className="text-white" />
                       </div>
                       <div>
                         <p className="font-bold text-dark">bKash</p>
-                        <p className="text-xs text-gray-500">You&apos;ll be redirected to bKash to complete payment</p>
+                        <p className="text-xs text-gray-500">
+                          {bkashAvailable ? 'You\'ll be redirected to bKash to complete payment' : bkashReason || 'Temporarily unavailable'}
+                        </p>
                       </div>
-                      <span className="ml-auto bg-pink-600 text-white text-xs px-2 py-0.5 rounded font-bold">POPULAR</span>
+                      {bkashAvailable && (
+                        <span className="ml-auto bg-pink-600 text-white text-xs px-2 py-0.5 rounded font-bold">POPULAR</span>
+                      )}
                     </div>
                   </label>
 
@@ -248,7 +334,7 @@ export default function CheckoutClient() {
                   <button onClick={handlePlaceOrder} disabled={loading}
                     className="flex-1 btn-primary py-3 text-center disabled:opacity-60">
                     {loading
-                      ? 'Redirecting to bKash...'
+                      ? payment.method === 'bkash' ? 'Connecting to bKash...' : 'Placing Order...'
                       : payment.method === 'bkash'
                         ? 'Pay with bKash →'
                         : 'Place Order →'}
@@ -266,6 +352,13 @@ export default function CheckoutClient() {
                 <h2 className="text-2xl font-bold text-dark mb-2">Order Placed!</h2>
                 <p className="text-gray-500 mb-1">Thank you for your order, {user?.name}!</p>
                 <p className="text-primary font-bold text-lg mb-6">Order #{order.orderNumber}</p>
+
+                {info && (
+                  <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 text-sm px-4 py-3 rounded-lg flex items-start gap-2 text-left">
+                    <Info size={16} className="flex-shrink-0 mt-0.5" />
+                    <span>{info}</span>
+                  </div>
+                )}
 
                 <div className="bg-gray-50 rounded-xl p-5 text-left mb-6">
                   <div className="grid grid-cols-2 gap-3 text-sm">
