@@ -106,7 +106,13 @@ export default function CheckoutClient() {
     const created = newOrder?.data || newOrder;
     setOrder(created);
     clearCart();
-    setStep(3);
+
+    const orderId = created?._id || created?.id;
+    if (orderId) {
+      router.push(`/orders/${orderId}`);
+    } else {
+      setStep(3);
+    }
   };
 
   const handlePlaceOrder = async () => {

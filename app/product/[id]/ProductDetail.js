@@ -2,13 +2,14 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingCart, Heart, Share2, ChevronRight, Shield, Truck, RefreshCcw, Plus, Minus, Check } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Share2, ChevronRight, Shield, Truck, RefreshCcw, Plus, Minus, Check, ImageOff } from 'lucide-react';
 import { useCart } from '../../../lib/CartContext';
 import { useAuth } from '../../../lib/CartContext';
 import { api } from '../../../lib/api';
 import ProductCard, { StarRating } from '../../../components/ProductCard';
 import Navbar from '../../../components/Navbar';
 import Footer from '../../../components/Footer';
+import NoImage from '../../../assets/no-image.png';
 
 export default function ProductDetail({ product }) {
   const { addToCart } = useCart();
@@ -49,7 +50,10 @@ export default function ProductDetail({ product }) {
   const discount = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
 
-  const images = product.images?.length ? product.images : [product.image];
+  const fallbackImage = product?.image || NoImage;
+  const images = (product?.images?.length ? product.images : [fallbackImage]).filter(Boolean);
+  const safeImages = images.length ? images : [NoImage];
+  const activeImageSrc = safeImages[activeImage] || NoImage;
 
   return (
     <main>
@@ -73,14 +77,29 @@ export default function ProductDetail({ product }) {
               {product?.badge && (
                 <span className="absolute top-4 left-4 z-10 bg-accent text-white text-sm font-bold px-3 py-1 rounded">{product?.badge}</span>
               )}
-              <Image src={images[activeImage]} alt={product?.name} fill className="object-contain p-8" priority />
+              {activeImageSrc
+                ? <Image src={activeImageSrc} alt={product?.name || 'Product image'} fill className="object-contain p-8" priority />
+                : (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-300">
+                    <ImageOff size={48} />
+                    <span className="text-xs mt-2">No image available</span>
+                  </div>
+                )
+              }
             </div>
-            {images.length > 1 && (
+            {safeImages.length > 1 && (
               <div className="flex gap-3">
-                {images.map((img, i) => (
+                {safeImages.map((img, i) => (
                   <button key={i} onClick={() => setActiveImage(i)}
                     className={`relative w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${activeImage === i ? 'border-primary' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <Image src={img} alt="" fill className="object-contain p-2" />
+                    {img
+                      ? <Image src={img} alt="" fill className="object-contain p-2" />
+                      : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                          <ImageOff size={20} className="text-gray-300" />
+                        </div>
+                      )
+                    }
                   </button>
                 ))}
               </div>
@@ -92,7 +111,7 @@ export default function ProductDetail({ product }) {
             <h1 className="text-2xl font-bold text-dark mb-3">{product.name}</h1>
             <div className="flex items-center gap-3 mb-4">
               <StarRating rating={product?.rating} size={16} />
-              <span className="text-sm text-gray-500">({product?.reviews} reviews)</span>
+              <span className="text-sm text-gray-500">({product?.numReviews ?? product?.reviews ?? 0} reviews)</span>
               <span className="text-sm text-green-600 font-medium">{product?.inStock ? '✓ In Stock' : '✗ Out of Stock'}</span>
             </div>
 
@@ -104,7 +123,7 @@ export default function ProductDetail({ product }) {
               </>}
             </div>
 
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">{product?.description}</p>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">{product?.description}</p>
 
             {/* Quantity */}
             <div className="flex items-center gap-4 mb-6">

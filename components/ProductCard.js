@@ -24,7 +24,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
           <Image src={product?.image || NoImage} alt={product?.name} fill className="object-contain p-2" />
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.reviews})</span></div>
+          <div className="flex items-center gap-2 mb-1"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.numReviews ?? product?.reviews ?? 0})</span></div>
           <p className="font-medium text-dark text-sm mb-2 line-clamp-2">{product?.name}</p>
           <div className="flex items-center gap-2">
             <span className="text-accent font-bold">৳{product?.price}</span>
@@ -54,7 +54,7 @@ export default function ProductCard({ product, layout = 'grid' }) {
         <ShoppingCart size={16} /> Add to Cart
       </button>
       <Link href={`/product/${product?.slug}`} className="block p-4">
-        <div className="flex items-center gap-1.5 mb-1.5"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.reviews})</span></div>
+        <div className="flex items-center gap-1.5 mb-1.5"><StarRating rating={product?.rating} /><span className="text-xs text-gray-400">({product?.numReviews ?? product?.reviews ?? 0})</span></div>
         <p className="font-medium text-dark text-sm mb-2 line-clamp-2 leading-snug">{product?.name}</p>
         <div className="flex items-center gap-2">
           <span className="text-accent font-bold text-base">৳{product?.price}</span>
