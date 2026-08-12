@@ -116,9 +116,9 @@ export default function ProductDetail({ product }) {
             </div>
 
             <div className="flex items-end gap-3 mb-6">
-              <span className="text-3xl font-bold text-accent">${product?.price}</span>
+              <span className="text-3xl font-bold text-accent">৳{product?.price}</span>
               {product?.originalPrice && <>
-                <span className="text-gray-400 text-xl line-through">${product?.originalPrice}</span>
+                <span className="text-gray-400 text-xl line-through">৳{product?.originalPrice}</span>
                 <span className="bg-red-100 text-accent text-sm font-bold px-2 py-0.5 rounded">-{discount}%</span>
               </>}
             </div>
