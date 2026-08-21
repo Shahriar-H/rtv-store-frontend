@@ -1,13 +1,57 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Phone, User, ShoppingCart, Heart, Eye, Menu, X, ChevronDown, LogOut, Package, Settings } from 'lucide-react';
+import { Search, Phone, User, ShoppingCart, Heart, Menu, X, ChevronDown, LogOut, Package, Settings, Loader2 } from 'lucide-react';
 import { useCart } from '../lib/CartContext';
 import { useAuth } from '../lib/CartContext';
 import CartDrawer from './CartDrawer';
 import Image from 'next/image';
 import logo from '../assets/logo.png';
+import NoImage from '../assets/no-image.png';
+import { api } from '../lib/api';
+
+function SuggestionDropdown({ loading, products, query, onSelect, onViewAll }) {
+  return (
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+      {loading ? (
+        <div className="flex items-center justify-center gap-2 py-6 text-sm text-gray-400">
+          <Loader2 size={16} className="animate-spin" /> Searching products...
+        </div>
+      ) : products.length === 0 ? (
+        <div className="py-6 text-center text-sm text-gray-400">No products found for &quot;{query}&quot;</div>
+      ) : (
+        <>
+          <div className="max-h-80 overflow-y-auto">
+            {products.map(p => (
+              <Link
+                key={p._id || p.slug}
+                href={`/product/${p.slug}`}
+                onClick={onSelect}
+                className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors"
+              >
+                <div className="relative w-10 h-10 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden">
+                  <Image src={p.image || NoImage} alt={p.name} fill sizes="40px" className="object-contain p-1" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-dark truncate">{p.name}</p>
+                  <p className="text-xs text-accent font-bold">৳{p.price}</p>
+                </div>
+                <Search size={14} className="text-gray-300 flex-shrink-0" />
+              </Link>
+            ))}
+          </div>
+          <button
+            onClick={onViewAll}
+            className="w-full py-2.5 text-xs font-semibold text-primary border-t border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            View all results for &quot;{query}&quot;
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function Navbar() {
   const { cartCount, setCartOpen } = useCart();
@@ -15,11 +59,59 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      setSuggestLoading(false);
+      setSuggestionsOpen(false);
+      return;
+    }
+    setSuggestLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const data = await api.getProducts({ search: q, perPage: 6 });
+        setSuggestions(data.data?.products || data.data || []);
+        setSuggestionsOpen(true);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSuggestLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const onClickOutside = (e) => {
+      if (!e.target.closest('[data-search-wrap]')) setSuggestionsOpen(false);
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) router.push('/shop?search=' + encodeURIComponent(searchQuery.trim()));
+    if (!searchQuery.trim()) return;
+    router.push('/shop?search=' + encodeURIComponent(searchQuery.trim()));
+    setSuggestionsOpen(false);
+  };
+
+  const handleViewAll = () => {
+    if (!searchQuery.trim()) return;
+    router.push('/shop?search=' + encodeURIComponent(searchQuery.trim()));
+    setSuggestionsOpen(false);
+  };
+
+  const closeSearch = () => {
+    setSuggestionsOpen(false);
+    setSearchQuery('');
+    setMobileOpen(false);
   };
 
   const handleLogout = () => { logout(); setUserMenuOpen(false); router.push('/'); };
@@ -38,20 +130,34 @@ export default function Navbar() {
         <div className="border-b border-gray-100 pt-4">
           <div className="container flex items-center justify-between h-16 gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              {/* <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">R</span>
-              </div>
-              <div className="leading-tight">
-                <div className="font-bold text-dark text-sm">ROBO</div>
-                <div className="text-gray-400 text-xs">TECH VALLEY</div>
-              </div> */}
               <Image src={logo} alt="Robo Tech Valley" width={100} height={20} className="object-contain" />
             </Link>
 
-            <form onSubmit={handleSearch} className="flex-1 max-w-2xl hidden md:flex items-center border border-gray-200 rounded-lg overflow-hidden">
-              <input type="text" placeholder="Search products..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="flex-1 px-4 py-3 text-sm outline-none" />
-              <button type="submit" className="px-4 py-3 text-gray-400 hover:text-primary transition-colors"><Search size={18} /></button>
-            </form>
+            <div data-search-wrap className="relative flex-1 max-w-2xl hidden md:block">
+              <form onSubmit={handleSearch} className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onFocus={() => suggestions.length > 0 && setSuggestionsOpen(true)}
+                  onKeyDown={e => e.key === 'Escape' && setSuggestionsOpen(false)}
+                  className="flex-1 px-4 py-3 text-sm outline-none"
+                />
+                <button type="submit" className="px-4 py-3 text-gray-400 hover:text-primary transition-colors">
+                  <Search size={18} />
+                </button>
+              </form>
+              {suggestionsOpen && (
+                <SuggestionDropdown
+                  loading={suggestLoading}
+                  products={suggestions}
+                  query={searchQuery.trim()}
+                  onSelect={() => { setSuggestionsOpen(false); setSearchQuery(''); }}
+                  onViewAll={handleViewAll}
+                />
+              )}
+            </div>
 
             <div className="flex items-center gap-5">
               <div className="hidden lg:flex items-center gap-2 text-sm">
@@ -62,7 +168,6 @@ export default function Navbar() {
                 </div>
               </div>
 
-              {/* User menu */}
               <div className="relative">
                 {user ? (
                   <button onClick={() => setUserMenuOpen(!userMenuOpen)} className="hidden sm:flex flex-col items-center text-gray-600 hover:text-primary transition-colors">
@@ -123,10 +228,28 @@ export default function Navbar() {
 
         {mobileOpen && (
           <div className="md:hidden bg-white border-t border-gray-100 px-4 pb-4">
-            <form onSubmit={handleSearch} className="flex items-center border border-gray-200 rounded-lg my-3 overflow-hidden">
-              <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="flex-1 px-3 py-2.5 text-sm outline-none" />
-              <button type="submit" className="px-3 text-gray-400"><Search size={18} /></button>
-            </form>
+            <div data-search-wrap className="relative my-3">
+              <form onSubmit={handleSearch} className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Escape' && setSuggestionsOpen(false)}
+                  className="flex-1 px-3 py-2.5 text-sm outline-none"
+                />
+                <button type="submit" className="px-3 text-gray-400"><Search size={18} /></button>
+              </form>
+              {suggestionsOpen && (
+                <SuggestionDropdown
+                  loading={suggestLoading}
+                  products={suggestions}
+                  query={searchQuery.trim()}
+                  onSelect={closeSearch}
+                  onViewAll={() => { handleViewAll(); setMobileOpen(false); }}
+                />
+              )}
+            </div>
             {navLinks.map(link => (
               <Link key={link.label} href={link.href} onClick={() => setMobileOpen(false)} className="flex items-center py-2.5 border-b border-gray-50 text-sm text-gray-700 font-medium">{link.label}</Link>
             ))}

@@ -11,9 +11,9 @@ import { Pagination } from '../../lib/Pagination';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'rating', label: 'Best Rated' },
+  { value: 'price', label: 'Price: Low to High' },
+  { value: '-price', label: 'Price: High to Low' },
+  { value: '-rating', label: 'Best Rated' },
 ];
 
 export default function ShopClient() {
@@ -36,7 +36,12 @@ export default function ShopClient() {
     maxPrice: searchParams.get('maxPrice') || '',
     page: parseInt(searchParams.get('page') || '1'),
   });
-  const [searchInput, setSearchInput] = useState(filters.search);
+
+  // ✅ Sync search filter when header navigates with a new ?search= param
+  useEffect(() => {
+    const urlSearch = searchParams.get('search') || '';
+    setFilters(prev => (prev.search === urlSearch ? prev : { ...prev, search: urlSearch, page: 1 }));
+  }, [searchParams]);
 
   // ✅ Fetch categories from backend
   const fetchCategories = useCallback(async () => {
@@ -73,11 +78,9 @@ export default function ShopClient() {
     }
   }, []);
 
-  // ✅ Initial load
   useEffect(() => {
     fetchCategories();
-    fetchProducts(filters);
-  }, [fetchCategories, fetchProducts]);
+  }, [fetchCategories]);
 
   // ✅ Refetch products when filters change
   useEffect(() => {
@@ -92,10 +95,19 @@ export default function ShopClient() {
     router.replace('/shop?' + params.toString(), { scroll: false });
   };
 
+  const updateFilters = (updates) => {
+    setFilters(prev => {
+      const newFilters = { ...prev, ...updates, page: 1 };
+      const params = new URLSearchParams();
+      Object.entries(newFilters).forEach(([k, v]) => v && params.set(k, v));
+      router.replace('/shop?' + params.toString(), { scroll: false });
+      return newFilters;
+    });
+  };
+
   const clearFilters = () => {
     const reset = { category: '', search: '', sort: '', minPrice: '', maxPrice: '', page: 1 };
     setFilters(reset);
-    setSearchInput('');
     router.replace('/shop');
   };
 
@@ -126,18 +138,6 @@ export default function ShopClient() {
 
         {/* Top bar */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          {/* Search */}
-          <form onSubmit={e => { e.preventDefault(); updateFilter('search', searchInput); }}
-            className="flex-1 min-w-[200px] max-w-md flex items-center border border-gray-200 rounded-lg overflow-hidden">
-            <Search size={16} className="ml-3 text-gray-400 flex-shrink-0" />
-            <input type="text" value={searchInput} onChange={e => setSearchInput(e.target.value)}
-              placeholder="Search products..." className="flex-1 px-3 py-2.5 text-sm outline-none" />
-            {searchInput && (
-              <button type="button" onClick={() => { setSearchInput(''); updateFilter('search', ''); }}
-                className="pr-3 text-gray-400 hover:text-dark"><X size={14} /></button>
-            )}
-          </form>
-
           {/* Sort */}
           <select value={filters.sort} onChange={e => updateFilter('sort', e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm outline-none focus:border-primary bg-white">
@@ -173,6 +173,7 @@ export default function ShopClient() {
             <FilterPanel
               filters={filters}
               updateFilter={updateFilter}
+              updateFilters={updateFilters}
               clearFilters={clearFilters}
               categories={categories}
               categoriesLoading={categoriesLoading}
@@ -191,6 +192,7 @@ export default function ShopClient() {
                 <FilterPanel
                   filters={filters}
                   updateFilter={(k, v) => { updateFilter(k, v); setSidebarOpen(false); }}
+                  updateFilters={(u) => { updateFilters(u); setSidebarOpen(false); }}
                   clearFilters={() => { clearFilters(); setSidebarOpen(false); }}
                   categories={categories}
                   categoriesLoading={categoriesLoading}
@@ -241,14 +243,18 @@ export default function ShopClient() {
 }
 
 // ✅ Updated FilterPanel with dynamic categories + loading state
-function FilterPanel({ filters, updateFilter, clearFilters, categories, categoriesLoading }) {
+function FilterPanel({ filters, updateFilter, updateFilters, clearFilters, categories, categoriesLoading }) {
   const [priceOpen, setPriceOpen] = useState(true);
   const [minVal, setMinVal] = useState(filters.minPrice);
   const [maxVal, setMaxVal] = useState(filters.maxPrice);
 
+  useEffect(() => {
+    setMinVal(filters.minPrice);
+    setMaxVal(filters.maxPrice);
+  }, [filters.minPrice, filters.maxPrice]);
+
   const applyPrice = () => {
-    updateFilter('minPrice', minVal);
-    updateFilter('maxPrice', maxVal);
+    updateFilters({ minPrice: minVal, maxPrice: maxVal });
   };
 
   return (

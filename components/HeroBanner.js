@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { api } from '../lib/api';
 import NoImage from '../assets/no-image.png';
+import { useRouter } from 'next/navigation';
 
 const slides1 = [
   {
@@ -51,6 +52,7 @@ export default function HeroBanner() {
   const [slides, setslides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sideDeals, setsideDeals] = useState(sideDeals1);
+  const router = useRouter();
 
   useEffect(() => {
     api.getProducts({ type: 'sale', perPage: 2 })
@@ -97,7 +99,7 @@ export default function HeroBanner() {
                 {slide?.name}
               </h1>
               <p className="text-gray-500 text-sm mb-6 max-w-xs">{slide?.description?.substring(0, 100)}</p>
-              <button className="btn-primary">Shop Now →</button>
+              <button onClick={() => router.push('/shop')} className="btn-primary">Shop Now →</button>
             </div>
             <div className="relative w-56 h-56 md:w-72 md:h-72 flex-shrink-0 mt-6 md:mt-0">
               <Image src={slide?.image || NoImage} alt={slide?.name} fill className="object-contain drop-shadow-2xl" />

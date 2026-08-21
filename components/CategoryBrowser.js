@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Tag } from 'lucide-react';
 import { api } from '../lib/api';
 import NoImage from '../assets/no-image.png';
+import { useRouter } from 'next/navigation';
 
 const categoryImages = {
   'televisions': 'https://images.unsplash.com/photo-1593359677879-a4bb92f4834c?w=80&q=80',
@@ -17,6 +18,7 @@ const categoryImages = {
 export default function CategoryBrowser() {
   const [categories, setCategories] = useState([]);
   const scrollRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     api.getCategories().then((data) => setCategories(data?.data || [])).catch(console.error);
@@ -48,6 +50,7 @@ export default function CategoryBrowser() {
       <div ref={scrollRef} className="flex gap-6 overflow-x-auto scrollbar-hide pb-2">
         {categories.map((cat) => (
           <button
+            onClick={() => router.push(`/shop?category=${cat.slug}`)}
             key={cat.id}
             className="group flex flex-col items-center flex-shrink-0 min-w-[100px]"
           >
