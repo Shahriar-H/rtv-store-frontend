@@ -117,7 +117,7 @@ export default function Navbar() {
   const handleLogout = () => { logout(); setUserMenuOpen(false); router.push('/'); };
 
   const navLinks = [
-    { label: 'Home test', href: '/' },
+    { label: 'Home test1', href: '/' },
     { label: 'Shop', href: '/shop' },
     { label: 'Contact', href: '/contact-us' },
     { label: 'Categories', href: '/shop', hasDropdown: false },
