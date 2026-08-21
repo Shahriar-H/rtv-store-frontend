@@ -10,7 +10,7 @@ export default function NewArrivals() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.getProducts({ type: 'new', limit: 8 })
+    api.getProducts({ type: 'all', limit: 8 })
       .then((data) => {
         console.log(data);
         

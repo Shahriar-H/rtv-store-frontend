@@ -50,7 +50,7 @@ export default function CountdownDeal() {
               ))}
             </div>
 
-            <Link href="/shop" className="btn-primary">
+            <Link href="/sale" className="btn-primary">
               Check it Out!
             </Link>
           </div>
